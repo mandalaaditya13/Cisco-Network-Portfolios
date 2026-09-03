@@ -10,8 +10,8 @@ This project simulates a multi-department enterprise network capable of supporti
 2. **Dynamic Routing (OSPF):** Configured Open Shortest Path First (OSPF) Single Area/Multi-Area across routers and multilayer switches to establish automated path selection and seamless routing convergence.
 3. **Gateway Redundancy (HSRP):** Implemented Hot Standby Router Protocol (HSRP) on distribution switches/routers to provide automatic gateway failover and zero downtime for end-users.
 4. **VLAN & Inter-VLAN Routing:** Logical network segmentation using 802.1Q trunking and SVI (Switched Virtual Interfaces) on Multilayer Switches to route traffic between different departments.
-5. **Security & Filtering (ACL):** Applied Extended ACLs to restrict specific inter-departmental traffic (such as blocking unauthorized web/social media access) and secured switch ports using Port-Security[cite: 2].
-6. **NAT Overload (PAT) & DHCP:** Configured **Standard ACLs** to identify and permit private internal IP subnets to be translated into public IP addresses via NAT Overload (PAT), alongside automated DHCP server scopes utilizing `ip helper-address`[cite: 2].
+5. **Security & Filtering (ACL):** Applied Extended ACLs to restrict specific traffic (such as blocking unauthorized web/social media access) and secured switch ports using Port-Security.
+6. **NAT Overload (PAT) & DHCP:** Configured **Standard ACLs** to identify and permit private internal IP subnets to be translated into public IP addresses via NAT Overload (PAT), alongside automated DHCP server scopes utilizing `ip helper-address`.
 
 ## 🛠️ Technology & Protocol Stack
 * **Routing Protocols:** OSPF, Static Routing, Default Routing
