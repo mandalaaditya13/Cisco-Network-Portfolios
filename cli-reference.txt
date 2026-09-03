@@ -1,0 +1,159 @@
+================================================================================
+COMPLETE CCNA CLI COMMAND REFERENCE & VERIFICATION GUIDE
+================================================================================
+
+1. Basic Device Configuration (Hostname, SSH, Passwords, Banner)
+--------------------------------------------------------------------------------
+• Where to configure: All Devices (Routers R1, R2, Multilayer Switches MLS1, MLS2, and Access Switches).
+• Main Commands:
+  enable
+  configure terminal
+  hostname <Device_Name>
+  no ip domain-lookup
+  enable secret <Password>
+  banner motd ^C RESTRICTED ACCESS! ^C
+  line con 0
+  password <Password>
+  login
+  line vty 0 4
+  login local
+  transport input ssh
+  username <Admin> privilege 15 secret <Password>
+  ip domain-name <Domain>
+  crypto key generate rsa 1024
+
+• Verification Commands (Show):
+  - show running-config (View all active configurations)
+  - show ip ssh (View SSH status)
+
+
+2. VLAN Creation & Trunk / Access Port Configuration
+--------------------------------------------------------------------------------
+• Where to configure:
+  - VLAN Creation & SVI: MLS1 and MLS2.
+  - Trunk Ports: Inter-switch and switch-to-MLS links.
+  - Access Ports: Department access switches.
+
+• Main Commands:
+  vlan 10
+  name Sales_Marketing
+  
+  interface GigabitEthernet 1/0/3
+  switchport mode trunk
+  
+  interface FastEthernet 2/1
+  switchport mode access
+  switchport access vlan 10
+
+• Verification Commands (Show):
+  - show vlan brief (View active VLANs and assigned ports)
+  - show interfaces trunk (View active trunk interfaces)
+
+
+3. IP Routing & SVI (Switched Virtual Interfaces)
+--------------------------------------------------------------------------------
+• Where to configure: MLS1 and MLS2.
+• Main Commands:
+  ip routing
+  interface Vlan10
+  ip address 172.29.1.2 255.255.255.128
+  no shutdown
+
+• Verification Commands (Show):
+  - show ip route (View routing table paths)
+  - show ip interface brief (View interface status and IP bindings)
+
+
+4. HSRP (Hot Standby Router Protocol)
+--------------------------------------------------------------------------------
+• Where to configure: MLS1 and MLS2 (under each VLAN SVI).
+• Main Commands:
+  interface Vlan10
+  standby 10 ip 172.29.1.1
+  standby 10 priority 120    ! (Use 110 for MLS2)
+  standby 10 preempt
+
+• Verification Commands (Show):
+  - show standby brief (View active/standby status per gateway)
+
+
+5. OSPF (Dynamic Routing Protocol)
+--------------------------------------------------------------------------------
+• Where to configure: All Routers (R1, R2) and Multilayer Switches (MLS1, MLS2).
+• Main Commands:
+  router ospf 1
+  router-id 1.1.1.1          ! (Use unique IDs per device: 2.2.2.2, etc.)
+  network 172.29.1.0 0.0.0.127 area 0
+  passive-interface Vlan10   ! (Optional for client SVIs)
+
+• Verification Commands (Show):
+  - show ip ospf neighbor (View OSPF neighbor adjacencies)
+  - show ip ospf database (View OSPF link-state database)
+
+
+6. DHCP Server & IP Helper-Address
+--------------------------------------------------------------------------------
+• Where to configure:
+  - DHCP Pool Setup: DHCP Server (located in VLAN 60).
+  - ip helper-address: MLS1 and MLS2 on each client VLAN interface.
+
+• Main Commands:
+  interface Vlan10
+  ip helper-address 172.29.3.132   ! (DHCP Server IP)
+
+• Verification Commands (Show):
+  - show ip dhcp binding (View active IP leases assigned to clients)
+
+
+7. Port-Security
+--------------------------------------------------------------------------------
+• Where to configure: Access Switches (e.g., Finance/Accounting Switch).
+• Main Commands:
+  interface FastEthernet 2/1
+  switchport port-security
+  switchport port-security maximum 1
+  switchport port-security violation shutdown
+  switchport port-security mac-address sticky
+
+• Verification Commands (Show):
+  - show port-security (View overall port-security status)
+  - show port-security interface fastethernet 2/1 (View sticky MAC bindings per port)
+
+
+8. NAT Overload (PAT) & Default Route
+--------------------------------------------------------------------------------
+• Where to configure: Edge / Perimeter Routers (R1 and R2).
+• Main Commands:
+  access-list 1 permit 172.29.0.0 0.0.255.255
+  
+  interface FastEthernet 1/0
+  ip nat inside
+  interface Serial2/0
+  ip nat outside
+  
+  ip nat inside source list 1 interface Serial2/0 overload
+  
+  ip route 0.0.0.0 0.0.0.0 <ISP_Next_Hop_IP>
+
+• Verification Commands (Show):
+  - show ip nat translations (View active translated private-to-public IP sessions)
+  - show ip route (Verify default route 'S*' entry)
+
+
+9. Extended ACL (Traffic Filtering / Blocking)
+--------------------------------------------------------------------------------
+• Where to configure:
+  - ACL Definition: MLS1 and MLS2.
+  - Interface Application: Applied inbound on target VLAN interfaces.
+
+• Main Commands:
+  ip access-list extended BLOK-WEB-SOCIALMEDIA
+  deny tcp 172.29.1.0 0.0.0.127 host 9.9.9.10 eq www
+  permit ip any any
+  
+  interface Vlan10
+  ip access-group BLOK-WEB-SOCIALMEDIA in
+
+• Verification Commands (Show):
+  - show access-lists (View ACL rules and match hit counters)
+```[cite: 2]
